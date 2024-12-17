@@ -3,11 +3,24 @@ import router from '@/router';
 import { useExpenseStore } from '@/stores/expense.store';
 import { defineProps, onMounted, ref, useTemplateRef } from 'vue';
 import { Toast } from 'bootstrap';
+/*import { Bar } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale
+} from 'chart.js'*/
 import Loader from '@/components/Loader.vue';
 
 const expenseStore = useExpenseStore();
 
 const toastMessage = ref(null);
+// const chartData = ref([]);
+
+//ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const toastRef = useTemplateRef('toast')
 const months = {
@@ -27,6 +40,21 @@ const months = {
 
 onMounted(async () => {
     await expenseStore.fetchMonthlyExpenseReport();
+    /*const labels = [];
+    const dataset = {
+       label: "Monthly Expenses",
+       backgroundColor: '#f87979',
+       data: [] 
+    };
+    console.log("dataset: ", dataset);
+    expenseStore.monthlyExpenses.forEach((expense) => {
+      labels.push(`${months[expense.month]}/${expense.year}`);
+      datasets.data.push(expense.amount);
+    });
+    chartData.value.push({
+      labels,
+      datasets: [dataset]
+    })*/
 })
 
 </script>
@@ -63,6 +91,16 @@ onMounted(async () => {
         <th>{{ expenseStore.monthlyExpenses.map(e => e.amount).length > 0 ? expenseStore.monthlyExpenses.map(e => e.amount).reduce((a,b) => a + b) : 0 }}</th>
     </tfoot>
   </table>
+  <!-- div id="expense-chart">
+    <Bar
+      id="expense-chart-id"
+      :options="{
+        responsive: true,
+        maintainAspectRatio: false
+      }"
+      :data="chartData"
+    />
+  </div -->
 </template>
 <style scoped>
 .et-icon {

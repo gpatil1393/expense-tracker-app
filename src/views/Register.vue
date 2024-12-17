@@ -1,12 +1,13 @@
 <script setup>
 import { useRouter } from 'vue-router';
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, useTemplateRef, watch } from 'vue';
 import { useUserStore } from '@/stores/user.store';
 import Loader from '../components/Loader.vue';
 import InputWithError from '@/components/InputWithError.vue';
+import { Toast } from 'bootstrap';
 const router = useRouter();
 const userStore = useUserStore();
-const { isLoading } = userStore;
+const { isLoading, isError } = userStore;
 const userForm = reactive({
     firstName: "", 
     lastName: "", 
@@ -17,6 +18,8 @@ const userForm = reactive({
 });
 
 const validationErros = ref({});
+const toastMessage = ref(null);
+const toastRef = useTemplateRef('toast')
 
 watch(() => userForm.confirmPassword, (newValue, oldValue) => {
     if (newValue !== userForm.password) {
@@ -27,8 +30,18 @@ watch(() => userForm.confirmPassword, (newValue, oldValue) => {
 })
 const submitHandler = async () => {
     console.log("userForm.value: ", userForm);
-    await userStore.register({ ...userForm });
-    router.replace({ path: "/" });
+    const newUser = await userStore.register({ ...userForm });
+    if (newUser) {
+        toastMessage.value = 'User created successfully!';
+        setTimeout(() => {
+            router.replace({ path: "/" });
+        }, 1500);
+        new Toast(toastRef.value, {
+            autohide: true,
+            delay: 2500
+        }).show();
+    }
+    // router.replace({ path: "/" });
 }
 
 const clearFieldError = (fieldKey) => {
@@ -39,6 +52,20 @@ const clearFieldError = (fieldKey) => {
 <template>
     <div class="container-fluid">
         <Loader v-if="isLoading"></Loader>
+        <div v-if="isError" class="alert alert-danger" role="alert">
+            {{ isError }}
+        </div>
+        <div class="toast-container position-absolute top-0 end-0 p-3" id="toastPlacement">
+            <div class="toast align-items-center text-white bg-primary border-0" role="alert" 
+                aria-live="assertive" aria-atomic="true" ref="toast">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        {{ toastMessage }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
         <form @submit.prevent="submitHandler">
             <div class="card border-primary mb-9">
                 <div class="card-header">

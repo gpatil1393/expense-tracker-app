@@ -38,6 +38,14 @@ const submitHandler = async () => {
     // router.replace({ path: "/" });
 }
 
+const resetExpenseForm = () => {
+    expense.categoryId = "0";
+    expense.amount = "0";
+    expense.paymentMethod = "";
+    expense.expenseDate = "";
+    expense.description = ""; 
+}
+
 const clearFieldError = async (fieldKey) => {
     // delete validationErrors[fieldKey];
     await expenseStore.clearValidationError(fieldKey);
@@ -152,7 +160,7 @@ onMounted(async () => {
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button type="button" class="btn btn-primary">Reset</button>&nbsp;
+                    <button type="button" class="btn btn-primary" @click="resetExpenseForm">Reset</button>&nbsp;
                     <button type="submit" class="btn btn-success">Save</button>
                 </div>
             </div>

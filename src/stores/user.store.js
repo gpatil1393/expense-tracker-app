@@ -12,6 +12,7 @@ const usePrivateState = defineStore('secret-store', () => {
 export const useUserStore = defineStore('userStore', () => {
     const privateState = usePrivateState();
     const loading = ref(false);
+    const error = ref(null);
     const load = (userForm) => {
         const username = useStorage("username").value;
         // const un = localStorage.getItem("username")
@@ -45,9 +46,19 @@ export const useUserStore = defineStore('userStore', () => {
 
     const register = async (user) => {
         loading.value = true;
-        const response = await UserService.register(user);
-        loading.value = false;
-        return response;
+        try {
+            error.value = null;
+            const response = await UserService.register(user);
+            loading.value = false;
+            return response;
+        } catch(e) {
+            console.log("Unable to create user", e);
+            loading.value = false;
+            error.value = "Unable to create user";
+            return null;
+        } finally {
+            loading.value = false;
+        }
     }
 
     const logout = () => {
@@ -70,7 +81,8 @@ export const useUserStore = defineStore('userStore', () => {
 
     const username = computed(() => privateState.username)
     const isLoading = computed(() => loading);
+    const isError = computed(() => error)
 
-    return { load, login, logout, register, isAuthenticated, username, isLoading }
+    return { load, login, logout, register, isAuthenticated, username, isLoading, isError }
 });
 

@@ -23,12 +23,14 @@ export const useExpenseStore = defineStore('expenseStore', {
                 value: 'CHEQUE',
                 text: 'Cheque'
             }
-        ]
+        ],
+        error: null
     }),
     actions: {
         async fetchExpenseCategories() {
             this.loading = true;
             try {
+                this.error = null;
                 const expenseCategories = useLocalStorage('expenseCategories');
                 // console.log("expenseCategories action: ", expenseCategories.value)
                 if (expenseCategories && expenseCategories.value.length > 0) {
@@ -42,6 +44,7 @@ export const useExpenseStore = defineStore('expenseStore', {
                 this.expenseCategories = categories;
             } catch(e) {
                 this.loading = false;
+                this.error = "Unable to fetch expense categories";
                 console.log("Unable to fetch expense categories", e);
             }
         },
@@ -92,22 +95,57 @@ export const useExpenseStore = defineStore('expenseStore', {
             return await ExpenseService.deleteExpense(expenseId);
         },
         async fetchExpenses() {
-            await this.fetchExpenseCategories();
-            const expenses = await ExpenseService.fetchAllExpenses();
+            try {
+                this.error = null;
+                this.loading = true;
+                await this.fetchExpenseCategories();
+                const expenses = await ExpenseService.fetchAllExpenses();
 
-            const categoryIdWiseCategories = {};
-            this.expenseCategories.forEach((category) => {
-                categoryIdWiseCategories[category.id] = category;
-            })
+                const categoryIdWiseCategories = {};
+                this.expenseCategories.forEach((category) => {
+                    categoryIdWiseCategories[category.id] = category;
+                })
 
-            console.log("categoryIdWiseCategories: ", categoryIdWiseCategories);
+                console.log("categoryIdWiseCategories: ", categoryIdWiseCategories);
 
-            this.expenseList = expenses.map((expense) => {
-                return {
-                    ...expense,
-                    category: categoryIdWiseCategories[expense.categoryId]
-                }
-            });
+                this.expenseList = expenses.map((expense) => {
+                    return {
+                        ...expense,
+                        category: categoryIdWiseCategories[expense.categoryId]
+                    }
+                });
+                this.loading = false;
+            } catch(e) {
+                this.loading = false;
+                this.error = "Unable to fetch expenses";
+                console.log("Unable to fetch expense list", e);
+            }
+        },
+        async filterExpenseRecords(filters) {
+            try {
+                this.error = null;
+                this.loading = true;
+                const expenses = await ExpenseService.filterExpenseRecords(filters);
+
+                const categoryIdWiseCategories = {};
+                this.expenseCategories.forEach((category) => {
+                    categoryIdWiseCategories[category.id] = category;
+                })
+
+                // console.log("categoryIdWiseCategories: ", categoryIdWiseCategories);
+
+                this.expenseList = expenses.map((expense) => {
+                    return {
+                        ...expense,
+                        category: categoryIdWiseCategories[expense.categoryId]
+                    }
+                });
+                this.loading = false;
+            } catch(e) {
+                this.loading = false;
+                this.error = "Unable to fetch expenses";
+                console.log("Unable to fetch expense list", e);
+            }
         },
         async fetchMonthlyExpenseReport() {
             try {

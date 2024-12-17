@@ -3,11 +3,16 @@ import { onMounted, ref, useTemplateRef } from 'vue'
 import Loader from '../components/Loader.vue'
 import { useExpenseStore } from '@/stores/expense.store'
 import ExpenseTable from './ExpenseTable.vue'
+import ExpenseFilter from './ExpenseFilter.vue';
 
 const expenseStore = useExpenseStore()
 
 const fetchExpenses = async () => {
   await expenseStore.fetchExpenses()
+}
+
+const filterExpenses = async (filters) => {
+  await expenseStore.filterExpenseRecords(filters);
 }
 
 onMounted(() => {
@@ -20,6 +25,10 @@ onMounted(() => {
     <div v-if="expenseStore.error" class="alert alert-danger" role="alert">
       {{ expenseStore.error }}
     </div>
+    <div class="container-fluid">
+      <ExpenseFilter @filterRecords="filterExpenses" @clearFilter="fetchExpenses"></ExpenseFilter>
+    </div>
+    <br/>
     <div class="row">
       <div class="card">
         <div class="card-body">
