@@ -21,7 +21,7 @@ import { RouterLink } from 'vue-router'
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <RouterLink to="/" class="nav-link" active-class="active">Home</RouterLink>
+              <RouterLink to="/" class="nav-link" exact-active-class="active" active-class="active">Home</RouterLink>
             </li>
             <li class="nav-item">
               <RouterLink to="expense" class="nav-link" active-class="active">Add Expense</RouterLink>
@@ -55,4 +55,8 @@ import { RouterLink } from 'vue-router'
   </header>
 </template>
 
-<style scoped></style>
+<style scoped>
+.active {
+  color: #FF0000 !important;
+}
+</style>

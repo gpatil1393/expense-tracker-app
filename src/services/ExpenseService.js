@@ -61,6 +61,27 @@ export const ExpenseService = {
         });
         return response.data;
     },
+    async filterExpenseRecords(filters) {
+        const reqParams = {};
+        if (filters.categoryId) {
+            reqParams['categoryId'] = filters.categoryId;
+        }
+        if (filters.expenseStartDate) {
+            reqParams['start'] = filters.expenseStartDate;
+        }
+        if (filters.expenseEndDate) {
+            reqParams['end'] = filters.expenseEndDate;
+        }
+        const response = await axios.get(`${API_BASE_URL}`, {
+            params: {
+                ...reqParams
+            },
+            headers: {
+                Authorization: `Bearer ${useSessionStorage("authToken").value}`
+            }
+        });
+        return response.data;
+    },
     async fetchMonthlyExpenseReport() {
         const response = await axios.get(`${API_BASE_URL}/monthly/report`, {
             headers: {
