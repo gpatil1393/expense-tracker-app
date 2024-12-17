@@ -1,0 +1,33 @@
+name: NodeJS CI with Maven
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up NodeJS
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+    - name: Install Packages and Build Application
+      run: 
+        npm ci
+        npm run build
+
+  deploy:
+
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - run: echo "deploying to external repo"
+    - run: echo "Step1"
+    - run: echo "Step2"
+    - run: echo "Step3"
